@@ -1,0 +1,98 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — SMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}?v=1.5" rel="stylesheet">
+  <script>
+    (function () {
+      let theme = localStorage.getItem('theme');
+      if (!theme) {
+        const hour = new Date().getHours();
+        theme = (hour < 6 || hour >= 18) ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card register-card">
+    <div class="auth-icon-wrapper">
+      <i class="bi bi-person-badge"></i>
+    </div>
+    <h4 class="auth-title">New Student Registration</h4>
+    <p class="auth-subtitle">Create your portal account to get started</p>
+
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" style="border-radius: 10px; font-size: 0.9rem; border: none; font-weight: 500;">
+      {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger" style="border-radius: 10px; font-size: 0.9rem; border: none; font-weight: 500;">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <form method="post" novalidate class="auth-form">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">First Name</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.first_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Last Name</label>
+          {{ form.last_name }}
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.username.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email Address</label>
+          {{ form.email }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone Number</label>
+          {{ form.phone }}
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Roll Number</label>
+          {{ form.roll_number }}
+          {% if form.roll_number.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.roll_number.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Password</label>
+          {{ form.password }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Confirm Password</label>
+          {{ form.confirm_password }}
+        </div>
+      </div>
+      
+      <button type="submit" class="auth-btn">Create Account</button>
+    </form>
+    
+    <div class="auth-footer">
+      <p class="small text-muted mb-0 font-weight-500">
+        Already have an account? <a href="{% url 'login' %}" class="auth-footer-link">Sign in here</a>
+      </p>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('input').forEach(el => {
+    if(el.type !== 'hidden' && el.type !== 'submit') el.classList.add('form-control');
+  });
+</script>
+</body>
+</html>

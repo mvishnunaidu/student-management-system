@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — SMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}?v=1.5" rel="stylesheet">
+  <script>
+    (function () {
+      let theme = localStorage.getItem('theme');
+      if (!theme) {
+        const hour = new Date().getHours();
+        theme = (hour < 6 || hour >= 18) ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-icon-wrapper">
+      <i class="bi bi-shield-lock"></i>
+    </div>
+    <h4 class="auth-title">Welcome Back</h4>
+    <p class="auth-subtitle">Sign in to your university portal</p>
+
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" style="border-radius: 10px; font-size: 0.9rem; border: none; font-weight: 500;">
+      {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <form method="post" novalidate class="auth-form">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="form-label">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.username.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="mb-4">
+        <label class="form-label d-flex justify-content-between">
+          Password
+          <a href="#" class="auth-footer-link" style="font-size: 0.8rem; text-transform: none; letter-spacing: normal;">Forgot?</a>
+        </label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.password.errors.0 }}</div>{% endif %}
+      </div>
+      
+      <button type="submit" class="auth-btn">Sign In to Portal</button>
+    </form>
+
+    <div class="auth-footer">
+      <p class="small text-muted mb-2 font-weight-500">
+        Don't have an account? <a href="{% url 'register' %}" class="auth-footer-link">New student registration</a>
+      </p>
+      <p class="small text-muted mb-0">
+        Faculty / Admin? <a href="/admin/" class="auth-footer-link text-muted">Admin Portal</a>
+      </p>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('input').forEach(el => {
+    if(el.type !== 'hidden' && el.type !== 'submit') el.classList.add('form-control');
+  });
+</script>
+</body>
+</html>
