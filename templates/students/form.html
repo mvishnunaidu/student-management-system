@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Student — SMS{% endblock %}
+{% block page_title %}{{ action }} Student{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex align-items-center mb-4 gap-2">
+    <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-secondary px-2 py-1">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <h4 class="fw-bold mb-0">{% if action == 'Add' %}Create Student Profile{% else %}Edit Student Profile{% endif %}</h4>
+  </div>
+
+  <div class="card form-card">
+    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+      <h5 class="fw-bold mb-0 text-primary">
+        <i class="bi {% if action == 'Add' %}bi-person-plus{% else %}bi-pencil-square{% endif %} me-2"></i>Student Details Form
+      </h5>
+      <p class="text-muted small mb-0 mt-1">Please fill in all required (*) information below.</p>
+    </div>
+    <div class="card-body px-4 pb-4">
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="row g-4">
+          <!-- First Name -->
+          <div class="col-md-6">
+            <label class="form-label">First Name *</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.first_name.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Last Name -->
+          <div class="col-md-6">
+            <label class="form-label">Last Name *</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.last_name.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Username -->
+          <div class="col-md-6">
+            <label class="form-label">Username *</label>
+            {{ form.username }}
+            {% if form.username.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.username.errors.0 }}</div>{% endif %}
+            {% if form.username.help_text %}<div class="text-muted small mt-1" style="font-size: 11px;">{{ form.username.help_text }}</div>{% endif %}
+          </div>
+          <!-- Email -->
+          <div class="col-md-6">
+            <label class="form-label">Email Address</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Roll Number -->
+          <div class="col-md-6">
+            <label class="form-label">Roll Number *</label>
+            {{ form.roll_number }}
+            {% if form.roll_number.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.roll_number.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Phone -->
+          <div class="col-md-6">
+            <label class="form-label">Phone Number</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.phone.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Department -->
+          <div class="col-md-6">
+            <label class="form-label">Department</label>
+            {{ form.department }}
+            {% if form.department.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.department.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Year -->
+          <div class="col-md-6">
+            <label class="form-label">Year of Study</label>
+            {{ form.year }}
+            {% if form.year.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.year.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Date of Birth -->
+          <div class="col-md-6">
+            <label class="form-label">Date of Birth</label>
+            {{ form.date_of_birth }}
+            {% if form.date_of_birth.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Password -->
+          <div class="col-md-6">
+            <label class="form-label">
+              Password {% if action == 'Edit' %}(Leave blank to keep existing){% endif %}
+            </label>
+            {{ form.password }}
+            {% if form.password.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.password.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Address -->
+          <div class="col-12">
+            <label class="form-label">Home Address</label>
+            {{ form.address }}
+            {% if form.address.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.address.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Profile Pic -->
+          <div class="col-12">
+            <label class="form-label">Profile Picture</label>
+            {{ form.profile_pic }}
+            {% if form.profile_pic.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.profile_pic.errors.0 }}</div>{% endif %}
+            {% if student.profile_pic %}
+              <div class="mt-2 text-muted small">
+                Current: <a href="{{ student.profile_pic.url }}" target="_blank" class="text-decoration-none fw-semibold">{{ student.profile_pic.name }}</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-5">
+          <button type="submit" class="btn btn-primary d-flex align-items-center gap-2 px-4">
+            <i class="bi bi-check-circle"></i> Save Student
+          </button>
+          <a href="{% url 'student_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

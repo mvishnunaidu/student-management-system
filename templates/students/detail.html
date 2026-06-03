@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.user.username }} Profile — SMS{% endblock %}
+{% block page_title %}Student Details{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex align-items-center mb-4 gap-2">
+    <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-secondary px-2 py-1">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <h4 class="fw-bold mb-0">Student Profile</h4>
+  </div>
+
+  <div class="row g-4">
+    <!-- Profile Card & Quick Stats -->
+    <div class="col-lg-4">
+      <div class="card table-card text-center p-4 mb-4">
+        {% if student.profile_pic %}
+          <img src="{{ student.profile_pic.url }}" class="rounded-circle mb-3 border border-3 border-primary p-1 mx-auto" width="110" height="110" style="object-fit:cover">
+        {% else %}
+          <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mb-3 mx-auto shadow-sm" style="width:110px;height:110px;font-size:2.8rem; font-weight:700;">
+            {{ student.user.first_name.0|upper }}{{ student.user.last_name.0|upper }}
+          </div>
+        {% endif %}
+        
+        <h5 class="fw-bold mb-1">{{ student.user.get_full_name|default:student.user.username }}</h5>
+        <p class="text-muted small mb-2">{{ student.roll_number }}</p>
+        <span class="badge bg-primary px-3 py-2 mb-3">{{ student.get_year_display }}</span>
+        
+        <div class="sidebar-divider my-3" style="border-top-color: var(--border-card);"></div>
+        
+        <div class="text-start small px-2">
+          <div class="d-flex align-items-center mb-3 text-muted">
+            <i class="bi bi-building me-3 text-primary fs-5"></i>
+            <div>
+              <div class="text-xs text-uppercase tracking-wider text-muted-50 fw-semibold" style="font-size: 10px;">Department</div>
+              <div class="fw-semibold text-main">{{ student.department|default:'Not Assigned' }}</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center mb-3 text-muted">
+            <i class="bi bi-telephone me-3 text-primary fs-5"></i>
+            <div>
+              <div class="text-xs text-uppercase tracking-wider text-muted-50 fw-semibold" style="font-size: 10px;">Phone Number</div>
+              <div class="fw-semibold text-main">{{ student.phone|default:'—' }}</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center mb-3 text-muted">
+            <i class="bi bi-envelope me-3 text-primary fs-5"></i>
+            <div>
+              <div class="text-xs text-uppercase tracking-wider text-muted-50 fw-semibold" style="font-size: 10px;">Email Address</div>
+              <div class="fw-semibold text-main">{{ student.user.email|default:'—' }}</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center mb-3 text-muted">
+            <i class="bi bi-calendar me-3 text-primary fs-5"></i>
+            <div>
+              <div class="text-xs text-uppercase tracking-wider text-muted-50 fw-semibold" style="font-size: 10px;">Date of Birth</div>
+              <div class="fw-semibold text-main">{{ student.date_of_birth|default:'—' }}</div>
+            </div>
+          </div>
+          <div class="d-flex align-items-start text-muted">
+            <i class="bi bi-geo-alt me-3 text-primary fs-5 mt-1"></i>
+            <div>
+              <div class="text-xs text-uppercase tracking-wider text-muted-50 fw-semibold" style="font-size: 10px;">Address</div>
+              <div class="fw-semibold text-main">{{ student.address|default:'—' }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="d-flex gap-2 mt-4 px-2">
+          <a href="{% url 'student_edit' student.pk %}" class="btn btn-warning btn-sm flex-grow-1 d-flex align-items-center justify-content-center gap-2">
+            <i class="bi bi-pencil"></i> Edit Profile
+          </a>
+          {% if request.user.is_staff %}
+          <a href="{% url 'student_delete' student.pk %}" class="btn btn-danger btn-sm flex-grow-1 d-flex align-items-center justify-content-center gap-2">
+            <i class="bi bi-trash"></i> Delete
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Attendance Summary Card -->
+      <div class="card table-card p-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <i class="bi bi-calendar-check-fill text-primary"></i>
+          <span class="fw-bold text-uppercase tracking-wider text-muted small" style="font-size: 11px;">Overall Attendance</span>
+        </div>
+        <div class="text-center py-2">
+          <div class="display-5 fw-bold text-{% if att_pct >= 75 %}success{% elif att_pct >= 50 %}warning{% else %}danger{% endif %}">
+            {{ att_pct }}%
+          </div>
+          <p class="text-muted small mt-1">Recommended threshold is 75%</p>
+        </div>
+        <div class="progress mt-2" style="height:10px; border-radius: 6px;">
+          <div class="progress-bar bg-{% if att_pct >= 75 %}success{% elif att_pct >= 50 %}warning{% else %}danger{% endif %}"
+               style="width:{{ att_pct }}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course & Results Lists -->
+    <div class="col-lg-8">
+      <!-- Enrolled Courses -->
+      <div class="card table-card mb-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center">
+          <i class="bi bi-book-fill text-primary fs-5 me-2"></i>
+          <span class="fw-bold text-uppercase tracking-wider text-muted small">Course Enrollments</span>
+        </div>
+        <div class="card-body p-0 mt-2">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="padding-left: 1.5rem;">Code</th>
+                  <th>Course Title</th>
+                  <th>Credits</th>
+                  <th style="padding-right: 1.5rem;">Department</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for en in enrollments %}
+                <tr>
+                  <td style="padding-left: 1.5rem;"><span class="badge bg-secondary">{{ en.course.code }}</span></td>
+                  <td class="fw-semibold text-main">{{ en.course.name }}</td>
+                  <td><span class="badge bg-light text-dark border">{{ en.course.credits }} credits</span></td>
+                  <td style="padding-right: 1.5rem;"><span class="badge bg-info">{{ en.course.department.code }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4" style="padding-left: 1.5rem; padding-right: 1.5rem;">This student is not enrolled in any courses.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results/Grades -->
+      <div class="card table-card">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center">
+          <i class="bi bi-award-fill text-primary fs-5 me-2"></i>
+          <span class="fw-bold text-uppercase tracking-wider text-muted small">Academic Grades</span>
+        </div>
+        <div class="card-body p-0 mt-2">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="padding-left: 1.5rem;">Course</th>
+                  <th>Marks Obtained</th>
+                  <th>Percentage</th>
+                  <th style="padding-right: 1.5rem;">Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in results %}
+                <tr>
+                  <td style="padding-left: 1.5rem;"><span class="badge bg-secondary">{{ r.course.code }}</span></td>
+                  <td class="fw-semibold text-main">{{ r.marks_obtained }} / {{ r.total_marks }}</td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="fw-bold">{{ r.percentage }}%</span>
+                      <div class="progress flex-grow-1" style="height: 6px; width: 80px; border-radius: 3px;">
+                        <div class="progress-bar bg-primary" style="width: {{ r.percentage }}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="padding-right: 1.5rem;">
+                    {% if r.grade == 'A+' or r.grade == 'A' %}
+                    <span class="badge bg-success px-3">{{ r.grade }}</span>
+                    {% elif r.grade == 'B+' or r.grade == 'B' %}
+                    <span class="badge bg-info px-3">{{ r.grade }}</span>
+                    {% elif r.grade == 'C' or r.grade == 'D' %}
+                    <span class="badge bg-warning text-dark px-3">{{ r.grade }}</span>
+                    {% else %}
+                    <span class="badge bg-danger px-3">{{ r.grade }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4" style="padding-left: 1.5rem; padding-right: 1.5rem;">No exam results recorded for this student.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

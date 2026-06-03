@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Course — SMS{% endblock %}
+{% block page_title %}{{ action }} Course{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex align-items-center mb-4 gap-2">
+    <a href="{% url 'course_list' %}" class="btn btn-sm btn-outline-secondary px-2 py-1">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <h4 class="fw-bold mb-0">{% if action == 'Add' %}Create Course{% else %}Edit Course{% endif %}</h4>
+  </div>
+
+  <div class="card form-card">
+    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+      <h5 class="fw-bold mb-0 text-primary">
+        <i class="bi bi-book-half me-2"></i>Course Details Form
+      </h5>
+      <p class="text-muted small mb-0 mt-1">Please fill in all required (*) course parameters.</p>
+    </div>
+    <div class="card-body px-4 pb-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row g-4">
+          <!-- Course Name -->
+          <div class="col-md-8">
+            <label class="form-label">Course Name *</label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.name.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Course Code -->
+          <div class="col-md-4">
+            <label class="form-label">Course Code *</label>
+            {{ form.code }}
+            {% if form.code.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.code.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Department -->
+          <div class="col-md-6">
+            <label class="form-label">Department *</label>
+            {{ form.department }}
+            {% if form.department.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.department.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Credits -->
+          <div class="col-md-6">
+            <label class="form-label">Credits</label>
+            {{ form.credits }}
+            {% if form.credits.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.credits.errors.0 }}</div>{% endif %}
+          </div>
+          <!-- Description -->
+          <div class="col-12">
+            <label class="form-label">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.description.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-5">
+          <button type="submit" class="btn btn-primary d-flex align-items-center gap-2 px-4">
+            <i class="bi bi-check-circle"></i> Save Course
+          </button>
+          <a href="{% url 'course_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

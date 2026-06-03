@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Results — {{ student.user.username }} — SMS{% endblock %}
+{% block page_title %}Academic Report{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex align-items-center mb-4 gap-2">
+    <a href="{% url 'student_detail' student.pk %}" class="btn btn-sm btn-outline-secondary px-2 py-1">
+      <i class="bi bi-arrow-left"></i> Back to Profile
+    </a>
+    <h4 class="fw-bold mb-0">Academic Report Card</h4>
+  </div>
+
+  <div class="card table-card mb-4">
+    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+      <h5 class="fw-bold mb-0 text-primary">
+        {{ student.user.get_full_name|default:student.user.username }}
+      </h5>
+      <p class="text-muted small mb-0 mt-1">Roll Number: **{{ student.roll_number }}** | Department: **{{ student.department.code|default:'Not Assigned' }}**</p>
+    </div>
+    <div class="card-body p-0 mt-2">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="padding-left: 1.5rem;">Course Title</th>
+              <th>Marks Obtained</th>
+              <th>Percentage</th>
+              <th>Grade</th>
+              <th style="padding-right: 1.5rem;">Exam Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+            <tr>
+              <td style="padding-left: 1.5rem;" class="fw-bold text-main">{{ r.course.name }}</td>
+              <td class="fw-semibold text-main">{{ r.marks_obtained }} / {{ r.total_marks }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-bold">{{ r.percentage }}%</span>
+                  <div class="progress flex-grow-1" style="height: 6px; width: 100px; border-radius: 3px;">
+                    <div class="progress-bar bg-primary" style="width: {{ r.percentage }}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {% if r.grade == 'A+' or r.grade == 'A' %}
+                <span class="badge bg-success px-3">{{ r.grade }}</span>
+                {% elif r.grade == 'B+' or r.grade == 'B' %}
+                <span class="badge bg-info px-3">{{ r.grade }}</span>
+                {% elif r.grade == 'C' or r.grade == 'D' %}
+                <span class="badge bg-warning text-dark px-3">{{ r.grade }}</span>
+                {% else %}
+                <span class="badge bg-danger px-3">{{ r.grade }}</span>
+                {% endif %}
+              </td>
+              <td class="text-muted" style="padding-right: 1.5rem;">{{ r.exam_date|date:"M d, Y"|default:'—' }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-5" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+                <i class="bi bi-journal-x d-block fs-2 mb-3 text-muted" style="opacity: 0.5;"></i>
+                No exam results recorded for this student.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

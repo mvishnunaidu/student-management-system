@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Delete Student — SMS{% endblock %}
+{% block page_title %}Delete Student{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex align-items-center mb-4 gap-2">
+    <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-secondary px-2 py-1">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <h4 class="fw-bold mb-0">Confirm Deletion</h4>
+  </div>
+
+  <div class="card form-card border-0 shadow-lg">
+    <div class="card-body text-center py-5 px-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mb-4" style="width: 90px; height: 90px;">
+        <i class="bi bi-person-x-fill" style="font-size: 3rem;"></i>
+      </div>
+      
+      <h4 class="fw-bold mb-2">Delete Student Profile?</h4>
+      <p class="text-muted mb-4">
+        Are you sure you want to permanently delete <strong class="text-main">{{ student.user.get_full_name|default:student.user.username }}</strong> (Roll: **{{ student.roll_number }}**)?
+        <br>
+        <span class="text-danger fw-semibold" style="font-size: 0.88rem;"><i class="bi bi-exclamation-triangle-fill"></i> This action is irreversible and will delete all associated course records, attendance sheets, and grades.</span>
+      </p>
+
+      <form method="post" class="d-flex justify-content-center gap-3 mt-4">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger px-4 d-flex align-items-center gap-2 py-2">
+          <i class="bi bi-trash-fill"></i> Yes, Delete Permanently
+        </button>
+        <a href="{% url 'student_list' %}" class="btn btn-outline-secondary px-4 py-2">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Academic Results — SMS{% endblock %}
+{% block page_title %}Academic Results{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">Academic Results</h4>
+      <p class="text-muted small mb-0">Record, filter, and view student marks, grade percentages, and overall results.</p>
+    </div>
+    {% if request.user.is_staff %}
+    <a href="{% url 'result_add' %}" class="btn btn-primary btn-sm d-flex align-items-center gap-2">
+      <i class="bi bi-plus-circle"></i> Add Result
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card table-card mb-4">
+    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+      <span class="fw-bold text-uppercase tracking-wider text-muted small"><i class="bi bi-funnel me-2"></i>Filter Results</span>
+    </div>
+    <div class="card-body px-4 pb-4">
+      <form method="get" class="row g-3">
+        <div class="col-md-5">
+          <label class="form-label">Filter by Student</label>
+          <select name="student_id" class="form-select">
+            <option value="">All Students</option>
+            {% for s in students %}
+            <option value="{{ s.pk }}" {% if sel_student == s.pk|stringformat:'s' %}selected{% endif %}>
+              {{ s.roll_number }} — {{ s.user.get_full_name|default:s.user.username }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label">Filter by Course</label>
+          <select name="course_id" class="form-select">
+            <option value="">All Courses</option>
+            {% for c in courses %}
+            <option value="{{ c.pk }}" {% if sel_course == c.pk|stringformat:'s' %}selected{% endif %}>
+              {{ c.code }} — {{ c.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end gap-2">
+          <button class="btn btn-primary w-100 py-2">Apply</button>
+          <a href="{% url 'result_list' %}" class="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center">Clear</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results Table -->
+  <div class="card table-card mb-4">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="padding-left: 1.5rem; width: 60px;">#</th>
+              <th>Roll No</th>
+              <th>Student Name</th>
+              <th>Course</th>
+              <th>Marks Obtained</th>
+              <th>Percentage</th>
+              <th>Grade</th>
+              {% if request.user.is_staff %}<th style="padding-right: 1.5rem; width: 100px;">Action</th>{% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+            <tr>
+              <td class="text-muted small" style="padding-left: 1.5rem;">{{ forloop.counter }}</td>
+              <td><a href="{% url 'student_detail' r.student.pk %}" class="text-decoration-none fw-bold text-primary">{{ r.student.roll_number }}</a></td>
+              <td class="fw-bold text-main">{{ r.student.user.get_full_name|default:r.student.user.username }}</td>
+              <td><span class="badge bg-secondary">{{ r.course.code }}</span></td>
+              <td class="fw-semibold text-main">{{ r.marks_obtained }} / {{ r.total_marks }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-bold">{{ r.percentage }}%</span>
+                  <div class="progress flex-grow-1" style="height: 6px; width: 80px; border-radius: 3px;">
+                    <div class="progress-bar bg-primary" style="width: {{ r.percentage }}%"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {% if r.grade == 'A+' or r.grade == 'A' %}
+                <span class="badge bg-success px-3">{{ r.grade }}</span>
+                {% elif r.grade == 'B+' or r.grade == 'B' %}
+                <span class="badge bg-info px-3">{{ r.grade }}</span>
+                {% elif r.grade == 'C' or r.grade == 'D' %}
+                <span class="badge bg-warning text-dark px-3">{{ r.grade }}</span>
+                {% else %}
+                <span class="badge bg-danger px-3">{{ r.grade }}</span>
+                {% endif %}
+              </td>
+              {% if request.user.is_staff %}
+              <td style="padding-right: 1.5rem;">
+                <a href="{% url 'result_edit' r.pk %}" class="btn btn-sm btn-outline-warning px-2 py-1" title="Edit Result">
+                  <i class="bi bi-pencil"></i>
+                </a>
+              </td>
+              {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted py-5" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+                <i class="bi bi-award d-block fs-2 mb-3 text-muted" style="opacity: 0.5;"></i>
+                No student exam results found.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

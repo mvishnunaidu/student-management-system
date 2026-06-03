@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Mark Attendance — {{ course.code }} — SMS{% endblock %}
+{% block page_title %}Mark Attendance{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">{{ course.name }} ({{ course.code }})</h4>
+      <p class="text-muted small mb-0">Recording attendance register for **{{ att_date|date:"M d, Y" }}**.</p>
+    </div>
+    <a href="{% url 'attendance_select' %}" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2">
+      <i class="bi bi-arrow-left"></i> Change Course / Date
+    </a>
+  </div>
+
+  {% if student_data %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="card table-card mb-4">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th style="padding-left: 1.5rem; width: 60px;">#</th>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th style="width: 320px;">Status</th>
+                <th style="padding-right: 1.5rem;">Remarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in student_data %}
+              <tr>
+                <td class="text-muted small" style="padding-left: 1.5rem;">{{ forloop.counter }}</td>
+                <td><span class="badge bg-light text-dark border">{{ item.student.roll_number }}</span></td>
+                <td class="fw-bold text-main">{{ item.student.user.get_full_name|default:item.student.user.username }}</td>
+                <td>
+                  <div class="d-flex gap-3 align-items-center">
+                    <!-- Present -->
+                    <div class="form-check form-check-inline m-0">
+                      <input class="form-check-input" type="radio"
+                             name="status_{{ item.student.id }}"
+                             value="P" id="P_{{ item.student.id }}"
+                             {% if item.status == 'P' %}checked{% endif %}>
+                      <label class="form-check-label text-success fw-bold small" for="P_{{ item.student.id }}">
+                        <i class="bi bi-check-circle-fill me-1"></i>Present
+                      </label>
+                    </div>
+                    <!-- Absent -->
+                    <div class="form-check form-check-inline m-0">
+                      <input class="form-check-input" type="radio"
+                             name="status_{{ item.student.id }}"
+                             value="A" id="A_{{ item.student.id }}"
+                             {% if item.status == 'A' %}checked{% endif %}>
+                      <label class="form-check-label text-danger fw-bold small" for="A_{{ item.student.id }}">
+                        <i class="bi bi-x-circle-fill me-1"></i>Absent
+                      </label>
+                    </div>
+                    <!-- Late -->
+                    <div class="form-check form-check-inline m-0">
+                      <input class="form-check-input" type="radio"
+                             name="status_{{ item.student.id }}"
+                             value="L" id="L_{{ item.student.id }}"
+                             {% if item.status == 'L' %}checked{% endif %}>
+                      <label class="form-check-label text-warning fw-bold small" for="L_{{ item.student.id }}">
+                        <i class="bi bi-clock-fill me-1"></i>Late
+                      </label>
+                    </div>
+                  </div>
+                </td>
+                <td style="padding-right: 1.5rem;">
+                  <input type="text"
+                         name="remarks_{{ item.student.id }}"
+                         value="{{ item.remarks }}"
+                         class="form-control form-control-sm"
+                         placeholder="Add optional notes...">
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-3 mt-4 mb-5">
+      <button type="submit" class="btn btn-primary d-flex align-items-center gap-2 px-4">
+        <i class="bi bi-save-fill"></i> Save Attendance Sheet
+      </button>
+      <a href="{% url 'attendance_select' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+    </div>
+  </form>
+
+  {% else %}
+  <div class="alert alert-warning d-flex align-items-center gap-3" role="alert" style="border-radius: 12px; border: none; font-weight: 500;">
+    <i class="bi bi-exclamation-triangle-fill fs-4 text-warning"></i>
+    <div>
+      No students are currently enrolled in **{{ course.name }}**.
+      You must <a href="{% url 'enroll_student' course.pk %}" class="alert-link text-decoration-underline">enroll students</a> before taking attendance.
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

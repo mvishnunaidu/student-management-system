@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Mark Attendance — SMS{% endblock %}
+{% block page_title %}Attendance Management{% endblock %}
+{% block content %}
+
+<div class="animated-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">Attendance Management</h4>
+      <p class="text-muted small mb-0">Record or update daily class attendance for specific courses.</p>
+    </div>
+  </div>
+
+  <div class="card form-card mb-4">
+    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
+      <h5 class="fw-bold mb-0 text-primary">
+        <i class="bi bi-calendar-check-fill me-2"></i>Select Course & Date
+      </h5>
+      <p class="text-muted small mb-0 mt-1">Specify parameters to initialize or edit the attendance register.</p>
+    </div>
+    <div class="card-body px-4 pb-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Select Course</label>
+          {{ form.course }}
+          {% if form.course.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.course.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Select Date</label>
+          {{ form.date }}
+          {% if form.date.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.date.errors.0 }}</div>{% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2">
+          <i class="bi bi-arrow-right-circle-fill"></i> Proceed to Attendance Sheet
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <a href="{% url 'attendance_report' %}" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
+      <i class="bi bi-file-earmark-bar-graph"></i> View Overall Attendance Report
+    </a>
+  </div>
+</div>
+
+{% endblock %}
