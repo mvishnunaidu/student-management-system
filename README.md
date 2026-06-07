@@ -1,4 +1,4 @@
-# 🎓 Nexus University Portal
+# 🎓 Student Management System
 
 <div align="center">
 
@@ -9,7 +9,7 @@
 [![MySQL](https://img.shields.io/badge/Database-MySQL-00758F?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Bootstrap](https://img.shields.io/badge/UI-Bootstrap_5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 
-**A full-stack University Portal with Role-Based Access Control, Attendance Tracking, Results Management, and a JWT-secured REST API.**
+**A full-stack Student Management System with Role-Based Access Control, Attendance Tracking, Results Management, and a JWT-secured REST API.**
 
 *Built with Django 4.2 LTS · 140 Students · 14 Teachers · 12 Courses · 82.4% Avg Attendance*
 
@@ -19,7 +19,7 @@
 
 ## 📌 About The Project
 
-**Nexus University Portal** is a production-style academic management system where **Admins**, **Teachers/HODs**, and **Students** each log in to a personalized dashboard showing only their relevant data.
+**Student Management System** is a production-style academic management system where **Admins**, **Teachers/HODs**, and **Students** each log in to a personalized dashboard showing only their relevant data.
 
 This project was built as a **fresher Django portfolio project** to demonstrate:
 - Full-stack web development with Django
@@ -75,10 +75,10 @@ User ──1:1── Student ──── Department
           Result     (marks → auto grade A+/A/B+/B/C/D/F)
 ```
 
-**Relational integrity:**  
-- `unique_together` on (Student, Course, Date) for attendance  
-- `unique_together` on (Student, Course) for results  
-- Grades auto-calculated in `Result.save()` override  
+**Relational integrity:**
+- `unique_together` on (Student, Course, Date) for attendance
+- `unique_together` on (Student, Course) for results
+- Grades auto-calculated in `Result.save()` override
 
 ---
 
@@ -112,8 +112,8 @@ student_management_system/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/student_management_system.git
-cd student_management_system
+git clone https://github.com/mvishnunaidu/student-management-system.git
+cd student-management-system
 ```
 
 ### 2. Create & Activate Virtual Environment
@@ -185,7 +185,7 @@ Open: **http://127.0.0.1:8000**
 | 🎓 Student | `naveen0` | `naveen@123` |
 | 🎓 Student | `anusha1` | `anusha@123` |
 
-> **Pattern:** All passwords = `firstname@123`  
+> **Pattern:** All passwords = `firstname@123`
 > Examples: `karthik@123`, `lakshmi@123`, `divya@123`
 
 ---
@@ -275,7 +275,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 
 ---
 
-## 🚀 Deployment
+## 🚀 Deployment Options
 
 | Platform | Status | Notes |
 |---|---|---|
