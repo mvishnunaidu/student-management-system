@@ -1,172 +1,293 @@
-# 🎓 Student Management System (SMS)
+# 🎓 Nexus University Portal
 
-[![Django Version](https://img.shields.io/badge/Django-4.2%20LTS-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
-[![Python Version](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![REST API](https://img.shields.io/badge/DRF-REST%20API-red?style=for-the-badge&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
-[![JWT Auth](https://img.shields.io/badge/Auth-JWT%20(SimpleJWT)-orange?style=for-the-badge&logo=json-web-tokens&logoColor=white)](https://django-rest-framework-simplejwt.readthedocs.io/)
-[![Database](https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![Frontend](https://img.shields.io/badge/Frontend-Bootstrap%205-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+<div align="center">
 
-A enterprise-grade, full-stack **Student Management System** designed to streamline academic operations. The application is built on Python's robust **Django 4.2 LTS** framework, utilizing **Django REST Framework (DRF)** for headless API capabilities secured via **JSON Web Tokens (JWT)**. It features a responsive, polished portal for students and administrators styled with **Bootstrap 5**.
+[![Django](https://img.shields.io/badge/Django-4.2_LTS-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![DRF](https://img.shields.io/badge/REST_API-DRF-red?style=for-the-badge&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
+[![JWT](https://img.shields.io/badge/Auth-JWT-orange?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://django-rest-framework-simplejwt.readthedocs.io/)
+[![MySQL](https://img.shields.io/badge/Database-MySQL-00758F?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Bootstrap](https://img.shields.io/badge/UI-Bootstrap_5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 
----
+**A full-stack University Portal with Role-Based Access Control, Attendance Tracking, Results Management, and a JWT-secured REST API.**
 
-## ⚡ Core Features
+*Built with Django 4.2 LTS · 140 Students · 14 Teachers · 12 Courses · 82.4% Avg Attendance*
 
-*   **🔒 Multi-Channel Authentication**: Hybrid authentication featuring standard Django session logins for the Web Portal and SimpleJWT tokens for external REST client integration.
-*   **👥 Student Profiles**: Full CRUD operations on student records including profile picture uploads, unique roll numbers, year classifications, and automatic contact records.
-*   **📚 Course & Enrollments**: Dynamic course listings categorized by department, allowing students to enroll in courses with database-level uniqueness constraints.
-*   **📊 Attendance Tracking**: Efficient dashboard interfaces for administrators to mark daily attendance (Present, Absent, Late) and for students to view their real-time attendance percentage metrics.
-*   **📝 Results & Automated Grading**: Automatic GPA/grade allocation (`A+`, `A`, `B+`, `B`, etc.) computed on database write operations by overriding ORM save cycles.
-*   **🔌 Headless REST API**: Fully functional endpoints for programmatic operations (students, courses, attendance, grades) with filter queries.
-*   **🌱 Auto-Seeding Command**: Single-command data population using random seeding libraries to instantiate reference records, test profiles, and transaction items.
+</div>
 
 ---
 
-## 📐 System Architecture & Database Schema
+## 📌 About The Project
 
-The database relies on relational integrity constraints mapped out in custom models across five decoupled apps: `accounts`, `students`, `courses`, `attendance`, and `results`.
+**Nexus University Portal** is a production-style academic management system where **Admins**, **Teachers/HODs**, and **Students** each log in to a personalized dashboard showing only their relevant data.
 
-```mermaid
-erDiagram
-    User ||--|| Student : "1:1 Profile"
-    Department ||--o{ Student : "belongs to"
-    Department ||--o{ Course : "offers"
-    Student ||--o{ Enrollment : "has"
-    Course ||--o{ Enrollment : "has"
-    Student ||--o{ Attendance : "records"
-    Course ||--o{ Attendance : "records"
-    Student ||--o{ Result : "receives"
-    Course ||--o{ Result : "for"
+This project was built as a **fresher Django portfolio project** to demonstrate:
+- Full-stack web development with Django
+- Role-Based Access Control (RBAC)
+- REST API design with JWT authentication
+- Database design with relational models
+- Modern responsive UI with animations
+
+---
+
+## ✨ Features
+
+### 👑 Admin
+- View all Students, Teachers, HODs, Departments, Courses
+- Add / Edit / Delete any record
+- View full attendance reports and all results
+- Access Django Admin panel at `/admin/`
+
+### 👨‍🏫 Teacher / HOD
+- Personal dashboard showing their assigned courses
+- Mark attendance for their course students
+- View results for students in their courses
+- HODs have a special badge in the system
+
+### 🎓 Student
+- View their own profile, enrolled courses
+- Check personal attendance percentage
+- View their own mid/final exam results and grades
+- Cannot see other students' data (data isolation)
+
+### 🔌 REST API
+- JWT-secured endpoints for all resources
+- Filterable attendance and results by student ID
+- Token refresh support
+
+### 🎨 Modern UI
+- Glassmorphism cards with animated gradients
+- Sky-blue attendance card (≥72%) / Amber warning card (<72%)
+- Dark / Light theme toggle
+- Floating icons, pulsing animations, Chart.js charts
+- Password show/hide toggle on login
+
+---
+
+## 🗄️ Database Schema
+
+```
+User ──1:1── Student ──── Department
+                │               │
+           Enrollment ───── Course ──── Teacher (HOD flag)
+                │
+          Attendance (P/A/L per course per day)
+          Result     (marks → auto grade A+/A/B+/B/C/D/F)
 ```
 
-### Decoupled Directory Structure
+**Relational integrity:**  
+- `unique_together` on (Student, Course, Date) for attendance  
+- `unique_together` on (Student, Course) for results  
+- Grades auto-calculated in `Result.save()` override  
+
+---
+
+## 🗂️ Project Structure
+
 ```
 student_management_system/
-├── sms/                  → Main settings, security configurations, and root URLs
-├── accounts/             → Session authentication routing, login/register forms, and primary portal dashboards
-├── students/             → Student profiling, department directory schemas, and admin controllers
-├── courses/              → Course catalogs and junction-level enrollment tables
-├── attendance/           → Attendance transaction records (daily registers)
-├── results/              → Academic test records and calculation rules
-├── api/                  → DRF serializers, viewsets, and JWT token controllers
-├── templates/            → Modular HTML structures built with Bootstrap 5 components
-├── static/               → Production assets (vanilla CSS styles, UI JS utilities, brand images)
-└── manage.py             → Command-line utility for administrative tasks
+├── sms/              → Settings, root URLs, WSGI
+├── accounts/         → Login, Register, Dashboard, seed_data command
+├── students/         → Student CRUD, Department model
+├── teachers/         → Teacher CRUD, HOD flag
+├── courses/          → Course CRUD, Enrollment model
+├── attendance/       → Attendance marking, reports, student view
+├── results/          → Results CRUD, auto-grading
+├── api/              → DRF ViewSets, Serializers, JWT
+├── templates/        → HTML (base.html + per-app templates)
+├── static/           → CSS (Glassmorphism), JS (theme, sidebar)
+├── .env.example      → Environment variable template
+├── requirements.txt  → All Python dependencies
+└── manage.py
 ```
 
 ---
 
-## ⚙️ Quick Setup (Windows Environment)
+## ⚙️ Local Setup
 
-Follow these steps to run the application locally on Windows:
+### Prerequisites
+- Python 3.10+
+- MySQL Server running locally
+- Git
 
-### 1. Prerequisite Installations
-Ensure Python 3.10+ is installed on your local computer. Ensure the option **"Add Python to PATH"** is checked during installation.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/YOUR_USERNAME/student_management_system.git
+cd student_management_system
+```
 
-### 2. Environment Initialization
-Clone the repository and open the workspace in VS Code, then launch a terminal and execute:
+### 2. Create & Activate Virtual Environment
 ```powershell
-# Initialize virtual environment
 python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Linux/Mac
+```
 
-# Activate virtual environment
-venv\Scripts\activate
-
-# Install application dependencies
+### 3. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Database Deployment & Seeding
-Execute database migrations and populate sample developer records:
-```powershell
-# Perform database schema migrations
-python manage.py migrate
-
-# Create your primary administrator credential
-python manage.py createsuperuser
-
-# Seed the database with high-quality mock data (Departments, Students, Courses, Attendance, Grades)
-python manage.py populate_data
+### 4. Configure Environment Variables
+```bash
+copy .env.example .env      # Windows
+# cp .env.example .env      # Linux/Mac
+```
+Edit `.env` and set your MySQL credentials:
+```env
+DB_NAME=student_management
+DB_USER=root
+DB_PASSWORD=your_password
+DB_HOST=127.0.0.1
+DB_PORT=3306
+SECRET_KEY=your-long-random-secret-key
+DEBUG=True
 ```
 
-### 4. Booting Up Server
-Run the local development server:
-```powershell
+### 5. Create MySQL Database
+```sql
+CREATE DATABASE student_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 6. Run Migrations
+```bash
+python manage.py migrate
+```
+
+### 7. Seed the Database (One Command!)
+```bash
+python manage.py seed_data
+```
+This creates:
+- **2 Admin accounts** (admin/admin, vishnu/vishnu)
+- **14 Teachers** with AP Telugu names (4 HODs)
+- **140 Students** with AP Telugu names
+- **12 Courses** across 4 departments
+- **2,520 Attendance records** → Avg **82.4%**
+- **420 Result records** with auto-graded marks
+
+### 8. Run the Development Server
+```bash
 python manage.py runserver
 ```
-Visit http://127.0.0.1:8000 in your browser to view the application. The Django Admin panel is located at http://127.0.0.1:8000/admin/.
+Open: **http://127.0.0.1:8000**
 
 ---
 
-## 🔑 Sample Testing Credentials
+## 🔑 Login Credentials
 
-If you populated the database using `populate_data`, you can test student accounts using:
+| Role | Username | Password |
+|:---:|:---:|:---:|
+| 👑 Admin | `admin` | `admin` |
+| 👑 Admin | `vishnu` | `vishnu` |
+| 👨‍🏫 Teacher (HOD) | `srinivas.r` | `srinivas@123` |
+| 👨‍🏫 Teacher | `bhavani.b` | `bhavani@123` |
+| 🎓 Student | `naveen0` | `naveen@123` |
+| 🎓 Student | `anusha1` | `anusha@123` |
 
-| Username | Password | Access Level |
-|---|---|---|
-| `admin` (or custom superuser) | *Your created password* | Admin Dashboard & Database Access |
-| `student1` | `student123` | Student Portal (View Attendance & Results) |
-| `student2` | `student123` | Student Portal (View Attendance & Results) |
-| `student3` | `student123` | Student Portal (View Attendance & Results) |
+> **Pattern:** All passwords = `firstname@123`  
+> Examples: `karthik@123`, `lakshmi@123`, `divya@123`
 
 ---
 
-## 🔌 API Documentation
+## 🔌 REST API Reference
 
-All API requests (except authentication) require a bearer token in the Authorization header.
+Base URL: `http://127.0.0.1:8000/api/`
 
-### 🔑 Authentication Flow
+### Step 1 — Get Access Token
+```http
+POST /api/token/
+Content-Type: application/json
 
-#### 1. Retrieve Access Token
-* **Endpoint**: `POST /api/token/`
-* **Body (JSON)**:
-```json
 {
   "username": "admin",
-  "password": "yourpassword"
+  "password": "admin"
 }
 ```
-* **Response (JSON)**:
+Response:
 ```json
 {
-  "refresh": "eyJhbGciOiJIUzI1NiIsIn...",
-  "access": "eyJhbGciOiJIUzI1NiIsIn..."
+  "access": "eyJhbGciOiJIUzI1NiIs...",
+  "refresh": "eyJhbGciOiJIUzI1NiIs..."
 }
 ```
 
-#### 2. Refresh Access Token
-* **Endpoint**: `POST /api/token/refresh/`
-* **Body (JSON)**:
-```json
-{
-  "refresh": "eyJhbGciOiJIUzI1NiIsIn..."
-}
+### Step 2 — Use Token in Requests
+```http
+GET /api/students/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 ```
+
+### Available Endpoints
+
+| Method | Endpoint | Description |
+|:---:|:---|:---|
+| `POST` | `/api/token/` | Get JWT access + refresh token |
+| `POST` | `/api/token/refresh/` | Refresh expired access token |
+| `GET` | `/api/students/` | List all students |
+| `GET` | `/api/courses/` | List all courses |
+| `GET` | `/api/attendance/?student_id=1` | Student attendance records |
+| `GET` | `/api/results/?student_id=1` | Student result records |
 
 ---
 
-### 📡 Data Endpoints
+## 🛠️ Tech Stack
 
-Include `Authorization: Bearer <access_token>` in your request headers.
-
-| Method | Endpoint | Query Parameters | Description |
-| :---: | :--- | :--- | :--- |
-| **GET** | `/api/students/` | *None* | Returns a paginated list of all student profiles. |
-| **GET** | `/api/courses/` | *None* | Returns a list of all active course listings. |
-| **GET** | `/api/attendance/` | `student_id` (Integer) | Returns attendance sheets. Filter using `?student_id=1`. |
-| **GET** | `/api/results/` | `student_id` (Integer) | Returns grade distributions. Filter using `?student_id=1`. |
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Backend** | Python 3.10+, Django 4.2 LTS | Core web framework |
+| **Database** | MySQL + PyMySQL | Relational data storage |
+| **REST API** | Django REST Framework | API endpoints |
+| **Auth** | SimpleJWT | JWT token authentication |
+| **Frontend** | Bootstrap 5 + Vanilla CSS | Responsive UI |
+| **Charts** | Chart.js | Department + enrollment charts |
+| **Fonts** | Google Fonts (Outfit, Inter) | Typography |
+| **Icons** | Bootstrap Icons | UI iconography |
 
 ---
 
-## 🛠️ Key Technical Implementations
+## 💡 Technical Highlights
 
-Recruiters and developers, take note of these design patterns implemented within the repository:
+| # | Pattern | Implementation |
+|---|---|---|
+| 1 | **RBAC** | `is_staff` flag + `student_profile`/`teacher_profile` relations |
+| 2 | **Auto-Grading** | `Result.save()` override computes grade from `marks_obtained` |
+| 3 | **ORM Optimization** | `select_related()` and `prefetch_related()` prevent N+1 queries |
+| 4 | **Data Isolation** | Students query filtered by `student=request.user.student_profile` |
+| 5 | **JWT Security** | 1-hour access tokens, 1-day refresh tokens |
+| 6 | **Seeding** | `manage.py seed_data` one command for full realistic data |
+| 7 | **Unique Constraints** | `unique_together` prevents duplicate attendance/results |
 
-1. **ORM N+1 Query Prevention**: Highly optimized database queries using Django's `.select_related()` and `.prefetch_related()` methods to eager-load foreign-key structures, decreasing query overhead.
-2. **Encapsulated Business Logic**: Grading logic is kept dry by overriding the standard `save()` method on the `Result` model. Grades are automatically computed instantly based on marks scored.
-3. **Idempotence & Bulk Execution**: The attendance engine implements `update_or_create()` queries for bulk submissions, preventing double-entry conflicts and enabling duplicate action safety.
-4. **Relational Constraints**: Relational tables include custom `unique_together` parameters (e.g., student-course-date for attendance, student-course for grades) preventing data corruption.
-5. **Decoupled Security Layer**: High-security token configurations implementing `rest_framework_simplejwt` with customizable token lifetimes (5-minute access, 1-day refresh).
-6. **Form Level Validation**: Custom view-model forms (`forms.py`) featuring Django field overrides, regex validators for telephone profiles, and custom clean routines.
-7. **Clean Modular Templates**: DRY template design with reusable template components and a primary layout wrapper (`base.html`), ensuring rapid UI modifications.
+---
+
+## 📦 Sample Data Stats
+
+| Item | Count |
+|---|---|
+| Students | 140 (AP Telugu names) |
+| Teachers | 14 (4 HODs) |
+| Departments | 4 (CS, EE, ECE, MECH) |
+| Courses | 12 |
+| Enrollments | 420 |
+| Attendance records | 2,520 |
+| Result records | 420 |
+| **Avg Attendance** | **82.4%** |
+
+---
+
+## 🚀 Deployment
+
+| Platform | Status | Notes |
+|---|---|---|
+| **PythonAnywhere** | ✅ Recommended (Free) | Supports MySQL, easy Django setup |
+| **Railway.app** | ✅ Works | Supports MySQL |
+| **Render.com** | ⚠️ Needs change | Switch to PostgreSQL |
+| **VPS / DigitalOcean** | ✅ Works | Full control |
+
+---
+
+<div align="center">
+
+**Made with ❤️ using Django · A fresher Django portfolio project**
+
+</div>

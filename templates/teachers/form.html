@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Teacher — Nexus Portal{% endblock %}
+{% block page_title %}{{ action }} Teacher{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center animated-fade-in stagger-1">
+  <div class="col-md-8 col-lg-6">
+    <div class="card card-glow-indigo">
+      <div class="card-header border-0 bg-transparent pt-4 pb-0 px-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+            <i class="bi bi-person-badge fs-4"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-bold">{{ action }} Teacher Profile</h5>
+            <p class="text-muted small mb-0">Fill out the details below to {{ action|lower }} a teacher.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label class="form-label">First Name</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors }}</div>{% endif %}
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">Last Name</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Email Address</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label">Username</label>
+              {{ form.username }}
+              {% if form.username.help_text %}<div class="text-muted small mt-1">{{ form.username.help_text }}</div>{% endif %}
+              {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">Password</label>
+              {{ form.password }}
+              {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-12"><hr class="text-muted opacity-25 my-1"></div>
+
+            <div class="col-sm-6">
+              <label class="form-label">Employee ID</label>
+              {{ form.employee_id }}
+              {% if form.employee_id.errors %}<div class="text-danger small mt-1">{{ form.employee_id.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="col-sm-6">
+              <label class="form-label">Department</label>
+              {{ form.department }}
+              {% if form.department.errors %}<div class="text-danger small mt-1">{{ form.department.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label">Phone</label>
+              {{ form.phone }}
+              {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="col-sm-6 d-flex align-items-center mt-4">
+              <div class="form-check form-switch mt-2">
+                {{ form.is_hod }}
+                <label class="form-check-label ms-2" for="{{ form.is_hod.id_for_label }}"><strong>Head of Department (HOD)</strong></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <a href="{% url 'teacher_list' %}" class="btn btn-light">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4">Save Teacher</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -9,6 +9,7 @@ urlpatterns = [
     path('', lambda request: redirect('dashboard'), name='home'),
     path('accounts/', include('accounts.urls')),
     path('students/', include('students.urls')),
+    path('teachers/', include('teachers.urls')),
     path('courses/', include('courses.urls')),
     path('attendance/', include('attendance.urls')),
     path('results/', include('results.urls')),

@@ -11,6 +11,10 @@ from courses.models import Enrollment
 
 @login_required
 def student_list(request):
+    # If the user is a student, they cannot view the student list directory. Redirect to their own profile page.
+    if hasattr(request.user, 'student_profile'):
+        return redirect('student_detail', pk=request.user.student_profile.pk)
+
     query    = request.GET.get('q', '').strip()
     students = Student.objects.select_related('user', 'department')
     if query:
@@ -25,6 +29,11 @@ def student_list(request):
 
 @login_required
 def student_detail(request, pk):
+    # If the user is a student, restrict them to viewing only their own details page.
+    if hasattr(request.user, 'student_profile') and request.user.student_profile.pk != pk:
+        messages.error(request, 'Access denied. You can only view your own profile page.')
+        return redirect('student_detail', pk=request.user.student_profile.pk)
+
     student     = get_object_or_404(Student, pk=pk)
     enrollments = Enrollment.objects.filter(student=student).select_related('course__department')
     from results.models import Result

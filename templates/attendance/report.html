@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Attendance Reports — SMS{% endblock %}
+{% block title %}Attendance Reports — Nexus Portal{% endblock %}
 {% block page_title %}Attendance Reports{% endblock %}
 {% block content %}
 
@@ -9,13 +9,14 @@
       <h4 class="fw-bold mb-1">Attendance Reports</h4>
       <p class="text-muted small mb-0">Monitor and filter class attendance records across the entire portal.</p>
     </div>
-    {% if request.user.is_staff %}
+    {% if not is_student %}
     <a href="{% url 'attendance_select' %}" class="btn btn-primary btn-sm d-flex align-items-center gap-2">
       <i class="bi bi-plus-circle"></i> Mark Attendance
     </a>
     {% endif %}
   </div>
 
+  {% if not is_student %}
   <!-- Filters Card -->
   <div class="card table-card mb-4">
     <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2">
@@ -52,6 +53,7 @@
       </form>
     </div>
   </div>
+  {% endif %}
 
   <!-- Records Table -->
   <div class="card table-card mb-4">

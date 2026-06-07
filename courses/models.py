@@ -7,6 +7,7 @@ class Course(models.Model):
     description = models.TextField(blank=True)
     credits     = models.IntegerField(default=3)
     department  = models.ForeignKey('students.Department', on_delete=models.CASCADE, related_name='courses')
+    teacher     = models.ForeignKey('teachers.Teacher', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_courses')
     created_at  = models.DateTimeField(auto_now_add=True)
 
     class Meta:

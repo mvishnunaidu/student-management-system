@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from students.models import Student, Department
-from courses.models import Course
+from courses.models import Course, Enrollment
 from attendance.models import Attendance
 from results.models import Result
 from .forms import LoginForm, RegisterForm
@@ -60,26 +60,64 @@ def logout_view(request):
 
 @login_required
 def dashboard_view(request):
-    total_students    = Student.objects.count()
-    total_courses     = Course.objects.count()
-    total_departments = Department.objects.count()
+    is_teacher = hasattr(request.user, 'teacher_profile')
+    is_student = hasattr(request.user, 'student_profile')
 
-    total_att   = Attendance.objects.count()
-    present_att = Attendance.objects.filter(status='P').count()
-    att_pct     = round(present_att / total_att * 100, 1) if total_att else 0
+    if is_teacher:
+        teacher = request.user.teacher_profile
+        my_courses = teacher.assigned_courses.all()
+        total_courses = my_courses.count()
+        total_students = Student.objects.filter(enrollments__course__in=my_courses).distinct().count()
+        total_departments = 1
+        
+        total_att = Attendance.objects.filter(course__in=my_courses).count()
+        present_att = Attendance.objects.filter(course__in=my_courses, status='P').count()
+        att_pct = round(present_att / total_att * 100, 1) if total_att else 0
+        
+        recent_students = Student.objects.filter(enrollments__course__in=my_courses).select_related('user', 'department').distinct().order_by('-created_at')[:5]
+        recent_results = Result.objects.filter(course__in=my_courses).select_related('student__user', 'course').order_by('-created_at')[:5]
+        
+        dept_data = [{'name': teacher.department.name if teacher.department else 'N/A', 'count': total_students}]
+        course_data = [{'name': c.name, 'code': c.code, 'count': c.enrollments.count()} for c in my_courses[:6]]
 
-    recent_students = Student.objects.select_related('user', 'department').order_by('-created_at')[:5]
-    recent_results  = Result.objects.select_related('student__user', 'course').order_by('-created_at')[:5]
+    elif is_student:
+        student = request.user.student_profile
+        my_enrollments = Enrollment.objects.filter(student=student).select_related('course')
+        total_courses = my_enrollments.count()
+        total_students = Student.objects.filter(department=student.department).count() if student.department else 1
+        total_departments = 1
+        
+        total_att = Attendance.objects.filter(student=student).count()
+        present_att = Attendance.objects.filter(student=student, status='P').count()
+        att_pct = round(present_att / total_att * 100, 1) if total_att else 0
+        
+        recent_students = Student.objects.filter(department=student.department).select_related('user', 'department').exclude(pk=student.pk)[:5]
+        recent_results = Result.objects.filter(student=student).select_related('student__user', 'course').order_by('-created_at')[:5]
+        
+        dept_data = [{'name': student.department.name if student.department else 'N/A', 'count': total_students}]
+        course_data = [{'name': en.course.name, 'code': en.course.code, 'count': en.course.enrollments.count()} for en in my_enrollments[:6]]
 
-    dept_data = [
-        {'name': d.name, 'count': d.students.count()}
-        for d in Department.objects.all()
-    ]
+    else:
+        total_students    = Student.objects.count()
+        total_courses     = Course.objects.count()
+        total_departments = Department.objects.count()
 
-    course_data = [
-        {'name': c.name, 'code': c.code, 'count': c.enrollments.count()}
-        for c in Course.objects.all()[:6]
-    ]
+        total_att   = Attendance.objects.count()
+        present_att = Attendance.objects.filter(status='P').count()
+        att_pct     = round(present_att / total_att * 100, 1) if total_att else 0
+
+        recent_students = Student.objects.select_related('user', 'department').order_by('-created_at')[:5]
+        recent_results  = Result.objects.select_related('student__user', 'course').order_by('-created_at')[:5]
+
+        dept_data = [
+            {'name': d.name, 'count': d.students.count()}
+            for d in Department.objects.all()
+        ]
+
+        course_data = [
+            {'name': c.name, 'code': c.code, 'count': c.enrollments.count()}
+            for c in Course.objects.all()[:6]
+        ]
 
     return render(request, 'dashboard.html', {
         'total_students':    total_students,
@@ -90,4 +128,6 @@ def dashboard_view(request):
         'recent_results':    recent_results,
         'dept_data':         dept_data,
         'course_data':       course_data,
+        'is_teacher':        is_teacher,
+        'is_student':        is_student,
     })

@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — SMS</title>
+  <title>Login — Nexus Portal</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-  <link href="{% static 'css/style.css' %}?v=1.5" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}?v=3.1" rel="stylesheet">
   <script>
     (function () {
       let theme = localStorage.getItem('theme');
@@ -21,12 +21,17 @@
 </head>
 <body>
 <div class="auth-wrapper">
+  <!-- Animated Background Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
   <div class="auth-card">
     <div class="auth-icon-wrapper">
       <i class="bi bi-shield-lock"></i>
     </div>
     <h4 class="auth-title">Welcome Back</h4>
-    <p class="auth-subtitle">Sign in to your university portal</p>
+    <p class="auth-subtitle">Sign in to your Nexus Portal</p>
 
     {% for message in messages %}
     <div class="alert alert-{{ message.tags }} alert-dismissible fade show" style="border-radius: 10px; font-size: 0.9rem; border: none; font-weight: 500;">
@@ -37,20 +42,30 @@
     <form method="post" novalidate class="auth-form">
       {% csrf_token %}
       <div class="mb-4">
-        <label class="form-label">Username</label>
-        {{ form.username }}
+        <label class="form-label text-muted">Username</label>
+        <div class="position-relative auth-input-wrapper">
+          <i class="bi bi-person position-absolute auth-input-icon"></i>
+          {{ form.username }}
+        </div>
         {% if form.username.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.username.errors.0 }}</div>{% endif %}
       </div>
       <div class="mb-4">
-        <label class="form-label d-flex justify-content-between">
-          Password
-          <a href="#" class="auth-footer-link" style="font-size: 0.8rem; text-transform: none; letter-spacing: normal;">Forgot?</a>
+        <label class="form-label text-muted d-flex justify-content-between">
+          <span>Password</span>
+          <a href="#" class="auth-footer-link" style="font-size: 0.85rem; text-transform: none;">Forgot?</a>
         </label>
-        {{ form.password }}
+        <div class="position-relative auth-input-wrapper">
+          <i class="bi bi-lock position-absolute auth-input-icon"></i>
+          {{ form.password }}
+          <i class="bi bi-eye position-absolute auth-input-icon-end" id="togglePassword" style="right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); transition: color 0.2s;"></i>
+        </div>
         {% if form.password.errors %}<div class="text-danger small mt-1 fw-bold">{{ form.password.errors.0 }}</div>{% endif %}
       </div>
       
-      <button type="submit" class="auth-btn">Sign In to Portal</button>
+      <button type="submit" class="auth-btn d-flex align-items-center justify-content-center gap-2">
+        <span>Sign In to Portal</span>
+        <i class="bi bi-arrow-right auth-btn-icon"></i>
+      </button>
     </form>
 
     <div class="auth-footer">
@@ -66,8 +81,27 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   document.querySelectorAll('input').forEach(el => {
-    if(el.type !== 'hidden' && el.type !== 'submit') el.classList.add('form-control');
+    if(el.type !== 'hidden' && el.type !== 'submit') {
+      el.classList.add('form-control');
+      el.classList.add('auth-input');
+    }
   });
+
+  const togglePassword = document.querySelector('#togglePassword');
+  const password = document.querySelector('input[name="password"]');
+  if(togglePassword && password) {
+    togglePassword.addEventListener('click', function (e) {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      this.classList.toggle('bi-eye');
+      this.classList.toggle('bi-eye-slash');
+      if (type === 'text') {
+        this.style.color = 'var(--primary)';
+      } else {
+        this.style.color = 'var(--text-muted)';
+      }
+    });
+  }
 </script>
 </body>
 </html>

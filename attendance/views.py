@@ -11,25 +11,43 @@ from .forms import AttendanceSelectForm
 @login_required
 def attendance_select(request):
     """Step 1 — pick a course and date."""
+    is_admin = request.user.is_staff
+    is_teacher = hasattr(request.user, 'teacher_profile')
+    if not (is_admin or is_teacher):
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+
     if request.method == 'POST':
         form = AttendanceSelectForm(request.POST)
+        if is_teacher:
+            form.fields['course'].queryset = request.user.teacher_profile.assigned_courses.all()
         if form.is_valid():
             cid  = form.cleaned_data['course'].id
             dt   = form.cleaned_data['date'].strftime('%Y-%m-%d')
             return redirect('mark_attendance', course_id=cid, date_str=dt)
     else:
         form = AttendanceSelectForm()
+        if is_teacher:
+            form.fields['course'].queryset = request.user.teacher_profile.assigned_courses.all()
     return render(request, 'attendance/select.html', {'form': form})
 
 
 @login_required
 def mark_attendance(request, course_id, date_str):
     """Step 2 — mark P/A/L for each enrolled student."""
-    if not request.user.is_staff:
-        messages.error(request, 'Admin access required.')
+    is_admin = request.user.is_staff
+    is_teacher = hasattr(request.user, 'teacher_profile')
+    if not (is_admin or is_teacher):
+        messages.error(request, 'Access denied.')
         return redirect('dashboard')
 
-    course      = get_object_or_404(Course, pk=course_id)
+    course = get_object_or_404(Course, pk=course_id)
+
+    # Teachers can only mark attendance for courses assigned to them
+    if is_teacher and course.teacher != request.user.teacher_profile:
+        messages.error(request, 'Access denied. You are not assigned to teach this course.')
+        return redirect('attendance_select')
+
     att_date    = datetime.strptime(date_str, '%Y-%m-%d').date()
     enrollments = Enrollment.objects.filter(course=course).select_related('student__user')
 
@@ -66,11 +84,27 @@ def attendance_report(request):
     student_id = request.GET.get('student_id')
     course_id  = request.GET.get('course_id')
 
-    records  = Attendance.objects.select_related('student__user', 'course').all()
-    students = Student.objects.select_related('user').all()
-    courses  = Course.objects.all()
+    is_student = hasattr(request.user, 'student_profile')
+    is_teacher = hasattr(request.user, 'teacher_profile')
 
-    if student_id:
+    if is_student:
+        # Students can only view their own attendance records
+        records = Attendance.objects.filter(student=request.user.student_profile).select_related('student__user', 'course')
+        students = Student.objects.filter(pk=request.user.student_profile.pk).select_related('user')
+        courses = Course.objects.filter(enrollments__student=request.user.student_profile)
+    elif is_teacher:
+        # Teachers can only view records for students in their assigned courses
+        teacher = request.user.teacher_profile
+        records = Attendance.objects.filter(course__teacher=teacher).select_related('student__user', 'course')
+        students = Student.objects.filter(enrollments__course__teacher=teacher).select_related('user').distinct()
+        courses = Course.objects.filter(teacher=teacher)
+    else:
+        # Admin can view everything
+        records  = Attendance.objects.select_related('student__user', 'course').all()
+        students = Student.objects.select_related('user').all()
+        courses  = Course.objects.all()
+
+    if student_id and not is_student:
         records = records.filter(student_id=student_id)
     if course_id:
         records = records.filter(course_id=course_id)
@@ -80,4 +114,5 @@ def attendance_report(request):
     return render(request, 'attendance/report.html', {
         'records': records, 'students': students, 'courses': courses,
         'sel_student': student_id, 'sel_course': course_id,
+        'is_student': is_student,
     })

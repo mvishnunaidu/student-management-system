@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
-{% block title %}Students — Nexus Portal{% endblock %}
-{% block page_title %}Student Directory{% endblock %}
+{% block title %}Teachers — Nexus Portal{% endblock %}
+{% block page_title %}Teacher Directory{% endblock %}
 {% block content %}
 
 <div class="animated-fade-in">
   <div class="d-flex justify-content-between align-items-center mb-4 stagger-1">
     <div>
-      <h4 class="fw-bold mb-1">Student Directory</h4>
-      <p class="text-muted small mb-0">View, search, and manage registered student profiles.</p>
+      <h4 class="fw-bold mb-1">Teacher Directory</h4>
+      <p class="text-muted small mb-0">View, search, and manage registered teacher profiles.</p>
     </div>
     {% if request.user.is_staff %}
-    <a href="{% url 'student_add' %}" class="btn btn-primary btn-sm d-flex align-items-center gap-2">
-      <i class="bi bi-plus-circle"></i> Add Student
+    <a href="{% url 'teacher_add' %}" class="btn btn-primary btn-sm d-flex align-items-center gap-2">
+      <i class="bi bi-plus-circle"></i> Add Teacher
     </a>
     {% endif %}
   </div>
@@ -20,12 +20,12 @@
     <div class="card-header bg-transparent border-0 pt-4 px-4">
       <form method="get" class="row g-2">
         <div class="col-md-9 col-sm-8">
-          <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by name, username, or roll number...">
+          <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by name, username, or Employee ID...">
         </div>
         <div class="col-md-3 col-sm-4 d-flex gap-2">
           <button class="btn btn-outline-secondary w-100">Search</button>
           {% if query %}
-            <a href="{% url 'student_list' %}" class="btn btn-outline-danger w-50 d-flex align-items-center justify-content-center">Clear</a>
+            <a href="{% url 'teacher_list' %}" class="btn btn-outline-danger w-50 d-flex align-items-center justify-content-center">Clear</a>
           {% endif %}
         </div>
       </form>
@@ -37,54 +37,56 @@
           <thead>
             <tr>
               <th style="padding-left: 1.5rem;">#</th>
-              <th>Roll No</th>
+              <th>Emp ID</th>
               <th>Name</th>
               <th>Department</th>
-              <th>Year</th>
+              <th>Role</th>
               <th>Phone</th>
               <th style="padding-right: 1.5rem;">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {% for s in students %}
+            {% for t in teachers %}
             <tr>
               <td class="text-muted small" style="padding-left: 1.5rem;">{{ forloop.counter }}</td>
-              <td><span class="badge bg-light text-dark border">{{ s.roll_number }}</span></td>
+              <td><span class="badge bg-light text-dark border">{{ t.employee_id }}</span></td>
               <td>
                 <div class="d-flex align-items-center gap-3">
-                  {% if s.profile_pic %}
-                    <img src="{{ s.profile_pic.url }}" class="rounded-circle border border-2 border-primary" width="38" height="38" style="object-fit:cover">
-                  {% else %}
-                    <div class="avatar-circle-sm {% cycle 'bg-gradient-0' 'bg-gradient-1' 'bg-gradient-2' 'bg-gradient-3' 'bg-gradient-4' %}">
-                      {{ s.user.first_name.0|upper }}{{ s.user.last_name.0|upper|default:s.user.username.0|upper }}
-                    </div>
-                  {% endif %}
+                  <div class="avatar-circle-sm {% cycle 'bg-gradient-0' 'bg-gradient-1' 'bg-gradient-2' 'bg-gradient-3' 'bg-gradient-4' %}">
+                    {{ t.user.first_name.0|upper }}{{ t.user.last_name.0|upper|default:t.user.username.0|upper }}
+                  </div>
                   <div>
-                    <a href="{% url 'student_detail' s.pk %}" class="text-decoration-none text-primary-gradient">
-                      {{ s.user.get_full_name|default:s.user.username }}
+                    <a href="{% url 'teacher_detail' t.pk %}" class="text-decoration-none text-primary-gradient">
+                      {{ t.user.get_full_name|default:t.user.username }}
                     </a>
                   </div>
                 </div>
               </td>
               <td>
-                {% if s.department %}
-                  <span class="badge bg-info">{{ s.department.code }}</span>
+                {% if t.department %}
+                  <span class="badge bg-info">{{ t.department.code }}</span>
                 {% else %}
                   <span class="text-muted">—</span>
                 {% endif %}
               </td>
-              <td><span class="fw-semibold">Year {{ s.year }}</span></td>
-              <td class="text-muted">{{ s.phone|default:'—' }}</td>
+              <td>
+                {% if t.is_hod %}
+                  <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> HOD</span>
+                {% else %}
+                  <span class="badge bg-secondary">Teacher</span>
+                {% endif %}
+              </td>
+              <td class="text-muted">{{ t.phone|default:'—' }}</td>
               <td style="padding-right: 1.5rem;">
                 <div class="d-flex gap-2">
-                  <a href="{% url 'student_detail' s.pk %}" class="btn-action btn-action-view" title="View Profile">
+                  <a href="{% url 'teacher_detail' t.pk %}" class="btn-action btn-action-view" title="View Profile">
                     <i class="bi bi-eye"></i>
                   </a>
-                  <a href="{% url 'student_edit' s.pk %}" class="btn-action btn-action-edit" title="Edit Student">
+                  <a href="{% url 'teacher_edit' t.pk %}" class="btn-action btn-action-edit" title="Edit Teacher">
                     <i class="bi bi-pencil"></i>
                   </a>
                   {% if request.user.is_staff %}
-                  <a href="{% url 'student_delete' s.pk %}" class="btn-action btn-action-delete" title="Delete Student">
+                  <a href="{% url 'teacher_delete' t.pk %}" class="btn-action btn-action-delete" title="Delete Teacher">
                     <i class="bi bi-trash"></i>
                   </a>
                   {% endif %}
@@ -95,7 +97,7 @@
             <tr>
               <td colspan="7" class="text-center text-muted py-5">
                 <i class="bi bi-search d-block fs-2 mb-3 text-muted" style="opacity: 0.5;"></i>
-                No student profiles found. Try a different search query.
+                No teacher profiles found. Try a different search query.
               </td>
             </tr>
             {% endfor %}

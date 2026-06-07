@@ -1,122 +1,181 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard — SMS{% endblock %}
+{% block title %}Dashboard — Nexus Portal{% endblock %}
 {% block page_title %}Dashboard Overview{% endblock %}
 {% block content %}
 
 <div class="animated-fade-in">
-  <!-- Stat Cards -->
+  <!-- ── STAT CARDS ── -->
   <div class="row g-4 mb-4">
-    <div class="col-xl-3 col-md-6">
-      <div class="card stat-card text-white h-100" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
-        <div class="card-body d-flex justify-content-between align-items-center">
+
+    <!-- Students Card -->
+    <div class="col-xl-3 col-md-6 stagger-1">
+      <div class="card stat-card card-glow-indigo h-100">
+        <div class="card-body d-flex justify-content-between align-items-center p-4">
           <div>
-            <div class="small text-white-50 fw-semibold text-uppercase tracking-wider">Total Students</div>
-            <div class="fs-1 fw-bold mt-1">{{ total_students }}</div>
+            <div class="small text-muted fw-semibold text-uppercase mb-2" style="letter-spacing:.1em;">
+              {% if is_student %}Classmates{% elif is_teacher %}My Students{% else %}Total Students{% endif %}
+            </div>
+            <div class="fs-1 fw-bold stat-number-glow" style="color: var(--primary);">{{ total_students }}</div>
           </div>
-          <div class="stat-icon bg-white bg-opacity-20 p-3 rounded-3">
-            <i class="bi bi-people-fill text-white"></i>
+          <div class="stat-icon p-3 rounded-4 icon-float" style="background: rgba(79,70,229,0.12); color: var(--primary);">
+            <i class="bi bi-people-fill" style="font-size:2.4rem;"></i>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="card stat-card text-white h-100" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
-        <div class="card-body d-flex justify-content-between align-items-center">
+
+    <!-- Courses Card -->
+    <div class="col-xl-3 col-md-6 stagger-2">
+      <div class="card stat-card card-glow-blue h-100">
+        <div class="card-body d-flex justify-content-between align-items-center p-4">
           <div>
-            <div class="small text-white-50 fw-semibold text-uppercase tracking-wider">Total Courses</div>
-            <div class="fs-1 fw-bold mt-1">{{ total_courses }}</div>
+            <div class="small text-muted fw-semibold text-uppercase mb-2" style="letter-spacing:.1em;">
+              {% if is_student %}My Courses{% elif is_teacher %}Courses Taught{% else %}Total Courses{% endif %}
+            </div>
+            <div class="fs-1 fw-bold stat-number-glow" style="color: var(--secondary);">{{ total_courses }}</div>
           </div>
-          <div class="stat-icon bg-white bg-opacity-20 p-3 rounded-3">
-            <i class="bi bi-book-fill text-white"></i>
+          <div class="stat-icon p-3 rounded-4 pulse-animation" style="background: rgba(14,165,233,0.12); color: var(--secondary);">
+            <i class="bi bi-book-fill" style="font-size:2.4rem;"></i>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="card stat-card text-white h-100" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
-        <div class="card-body d-flex justify-content-between align-items-center">
+
+    <!-- Departments Card -->
+    <div class="col-xl-3 col-md-6 stagger-3">
+      <div class="card stat-card card-glow-emerald h-100">
+        <div class="card-body d-flex justify-content-between align-items-center p-4">
           <div>
-            <div class="small text-white-50 fw-semibold text-uppercase tracking-wider">Departments</div>
-            <div class="fs-1 fw-bold mt-1">{{ total_departments }}</div>
+            <div class="small text-muted fw-semibold text-uppercase mb-2" style="letter-spacing:.1em;">
+              {% if is_student or is_teacher %}My Department{% else %}Departments{% endif %}
+            </div>
+            <div class="fs-1 fw-bold stat-number-glow" style="color: var(--accent);">{{ total_departments }}</div>
           </div>
-          <div class="stat-icon bg-white bg-opacity-20 p-3 rounded-3">
-            <i class="bi bi-diagram-3-fill text-white"></i>
+          <div class="stat-icon p-3 rounded-4 spin-slow" style="background: rgba(16,185,129,0.12); color: var(--accent);">
+            <i class="bi bi-diagram-3-fill" style="font-size:2.4rem;"></i>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-      <div class="card stat-card text-white h-100" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-        <div class="card-body d-flex justify-content-between align-items-center">
+
+    <!-- Attendance Card — Sky Blue if >=72%, Amber if below -->
+    <div class="col-xl-3 col-md-6 stagger-4">
+      {% if att_pct >= 72 %}
+      <div class="card stat-card card-glow-sky h-100">
+        <div class="card-body d-flex justify-content-between align-items-center p-4">
           <div>
-            <div class="small text-white-50 fw-semibold text-uppercase tracking-wider">Avg Attendance</div>
-            <div class="fs-1 fw-bold mt-1">{{ att_pct }}%</div>
+            <div class="small fw-semibold text-uppercase mb-2" style="letter-spacing:.1em; color:#0ea5e9;">
+              {% if is_student %}My Attendance{% else %}Avg Attendance{% endif %}
+            </div>
+            <div class="fs-1 fw-bold" style="color: #0ea5e9; filter: drop-shadow(0 0 8px rgba(14,165,233,0.5));">{{ att_pct }}%</div>
           </div>
-          <div class="stat-icon bg-white bg-opacity-20 p-3 rounded-3">
-            <i class="bi bi-calendar-check-fill text-white"></i>
+          <div class="stat-icon p-3 rounded-4 pulse-animation" style="background: rgba(14,165,233,0.15); color: #0ea5e9;">
+            <i class="bi bi-calendar-check-fill" style="font-size:2.4rem;"></i>
           </div>
         </div>
       </div>
+      {% else %}
+      <div class="card stat-card card-glow-amber h-100">
+        <div class="card-body d-flex justify-content-between align-items-center p-4">
+          <div>
+            <div class="small text-muted fw-semibold text-uppercase mb-2" style="letter-spacing:.1em;">
+              {% if is_student %}My Attendance{% else %}Avg Attendance{% endif %}
+            </div>
+            <div class="fs-1 fw-bold" style="color: var(--warning);">{{ att_pct }}%</div>
+          </div>
+          <div class="stat-icon p-3 rounded-4 shake-animation" style="background: rgba(245,158,11,0.12); color: var(--warning);">
+            <i class="bi bi-calendar-x-fill" style="font-size:2.4rem;"></i>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
+
   </div>
 
-  <!-- Interactive Charts Section -->
+  <!-- ── CHARTS ── -->
   <div class="row g-4 mb-4">
     <div class="col-lg-5">
-      <div class="card h-100 table-card">
-        <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center">
-          <i class="bi bi-pie-chart-fill text-primary fs-4 me-2"></i>
-          <span class="fw-bold text-uppercase tracking-wider text-muted small">Department Distribution</span>
+      <div class="card h-100">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center gap-2">
+          <i class="bi bi-pie-chart-fill text-primary fs-4 icon-float"></i>
+          <span class="fw-bold text-uppercase text-muted" style="font-size:.78rem;letter-spacing:.12em;">Department Distribution</span>
         </div>
-        <div class="card-body d-flex justify-content-center align-items-center" style="position: relative; min-height: 300px;">
+        <div class="card-body d-flex justify-content-center align-items-center" style="position:relative;min-height:280px;">
           <canvas id="deptChart"></canvas>
         </div>
       </div>
     </div>
-
     <div class="col-lg-7">
-      <div class="card h-100 table-card">
-        <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center">
-          <i class="bi bi-bar-chart-line-fill text-primary fs-4 me-2"></i>
-          <span class="fw-bold text-uppercase tracking-wider text-muted small">Course Enrollments</span>
+      <div class="card h-100">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center gap-2">
+          <i class="bi bi-bar-chart-line-fill text-primary fs-4 pulse-animation"></i>
+          <span class="fw-bold text-uppercase text-muted" style="font-size:.78rem;letter-spacing:.12em;">Course Enrollments</span>
         </div>
-        <div class="card-body" style="position: relative; min-height: 300px;">
+        <div class="card-body" style="position:relative;min-height:280px;">
           <canvas id="courseChart"></canvas>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Recent Entries Section -->
+  <!-- ── RECENT STUDENTS & RESULTS ── -->
   <div class="row g-4">
+
     <!-- Recent Students -->
     <div class="col-lg-6">
-      <div class="card table-card h-100">
+      <div class="card h-100">
         <div class="card-header bg-transparent border-0 py-3 px-4 d-flex justify-content-between align-items-center">
-          <span class="fw-bold text-uppercase tracking-wider text-muted small"><i class="bi bi-people me-2"></i>Recent Students</span>
-          <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-primary py-1 px-3">View All</a>
+          <span class="fw-bold text-uppercase text-muted" style="font-size:.78rem;letter-spacing:.12em;">
+            <i class="bi bi-people me-2 icon-float d-inline-block"></i>
+            {% if is_student %}My Classmates{% else %}Recent Students{% endif %}
+          </span>
+          {% if not is_student %}
+          <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-primary py-1 px-3" style="border-radius:20px;font-size:.82rem;">View All</a>
+          {% endif %}
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
               <thead>
                 <tr>
-                  <th>Roll No</th>
+                  <th style="padding-left:1.5rem;">Roll No</th>
                   <th>Name</th>
-                  <th>Department</th>
-                  <th>Year</th>
+                  <th>Dept</th>
+                  <th style="padding-right:1.5rem;">Year</th>
                 </tr>
               </thead>
               <tbody>
                 {% for s in recent_students %}
                 <tr>
-                  <td><a href="{% url 'student_detail' s.pk %}" class="text-decoration-none fw-bold text-primary">{{ s.roll_number }}</a></td>
-                  <td class="fw-semibold">{{ s.user.get_full_name|default:s.user.username }}</td>
-                  <td><span class="badge bg-info">{{ s.department.code|default:'—' }}</span></td>
-                  <td>Year {{ s.year }}</td>
+                  <td style="padding-left:1.5rem;">
+                    <span class="badge bg-info">{{ s.roll_number }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      {% if s.profile_pic %}
+                        <img src="{{ s.profile_pic.url }}" class="rounded-circle border border-2 border-primary" width="38" height="38" style="object-fit:cover;">
+                      {% else %}
+                        <div class="avatar-circle-sm {% cycle 'bg-gradient-0' 'bg-gradient-1' 'bg-gradient-2' 'bg-gradient-3' 'bg-gradient-4' %}">
+                          {{ s.user.first_name.0|upper }}{{ s.user.last_name.0|upper|default:s.user.username.0|upper }}
+                        </div>
+                      {% endif %}
+                      <a href="{% url 'student_detail' s.pk %}" class="text-decoration-none text-primary-gradient fw-semibold">
+                        {{ s.user.get_full_name|default:s.user.username }}
+                      </a>
+                    </div>
+                  </td>
+                  <td>
+                    {% if s.department %}
+                      <span class="badge bg-info">{{ s.department.code }}</span>
+                    {% else %}
+                      <span class="text-muted">—</span>
+                    {% endif %}
+                  </td>
+                  <td style="padding-right:1.5rem;"><span class="fw-semibold">Year {{ s.year }}</span></td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" class="text-center text-muted py-4">No students enrolled yet</td></tr>
+                <tr><td colspan="4" class="text-center text-muted py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No students yet</td></tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -127,10 +186,13 @@
 
     <!-- Recent Results -->
     <div class="col-lg-6">
-      <div class="card table-card h-100">
+      <div class="card h-100">
         <div class="card-header bg-transparent border-0 py-3 px-4 d-flex justify-content-between align-items-center">
-          <span class="fw-bold text-uppercase tracking-wider text-muted small"><i class="bi bi-award me-2"></i>Recent Results</span>
-          <a href="{% url 'result_list' %}" class="btn btn-sm btn-outline-primary py-1 px-3">View All</a>
+          <span class="fw-bold text-uppercase text-muted" style="font-size:.78rem;letter-spacing:.12em;">
+            <i class="bi bi-award me-2 pulse-animation d-inline-block"></i>
+            {% if is_student %}My Recent Results{% else %}Recent Results{% endif %}
+          </span>
+          <a href="{% url 'result_list' %}" class="btn btn-sm btn-outline-primary py-1 px-3" style="border-radius:20px;font-size:.82rem;">View All</a>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
@@ -148,7 +210,7 @@
                 <tr>
                   <td class="fw-semibold">{{ r.student.roll_number }}</td>
                   <td>{{ r.course.code }}</td>
-                  <td>{{ r.marks_obtained }}/{{ r.total_marks }}</td>
+                  <td><span class="fw-bold" style="color:var(--primary);">{{ r.marks_obtained|floatformat:0 }}</span><span class="text-muted">/{{ r.total_marks|floatformat:0 }}</span></td>
                   <td>
                     {% if r.grade == 'A+' or r.grade == 'A' %}
                     <span class="badge bg-success">{{ r.grade }}</span>
@@ -162,7 +224,7 @@
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" class="text-center text-muted py-4">No results recorded yet</td></tr>
+                <tr><td colspan="4" class="text-center text-muted py-4"><i class="bi bi-inbox fs-3 d-block mb-2"></i>No results yet</td></tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -170,34 +232,32 @@
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
 {% endblock %}
 
 {% block extra_js %}
-<!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
     const getTextColor = () => isDark() ? '#94a3b8' : '#64748b';
-    const getGridColor = () => isDark() ? '#1e293b' : '#f1f5f9';
+    const getGridColor = () => isDark() ? '#1e1e3a' : '#f1f5f9';
 
-    // ─── DEPARTMENT CHART ───
+    // Dept Doughnut Chart
     const deptCtx = document.getElementById('deptChart').getContext('2d');
-    const deptLabels = [{% for d in dept_data %}"{{ d.name }}",{% endfor %}];
-    const deptCounts = [{% for d in dept_data %}{{ d.count }},{% endfor %}];
-    
     const deptChart = new Chart(deptCtx, {
       type: 'doughnut',
       data: {
-        labels: deptLabels,
+        labels: [{% for d in dept_data %}"{{ d.name }}",{% endfor %}],
         datasets: [{
-          data: deptCounts,
-          backgroundColor: ['#6366f1', '#0ea5e9', '#14b8a6', '#f59e0b', '#f43f5e'],
-          borderWidth: isDark() ? 2 : 1,
-          borderColor: isDark() ? '#151d30' : '#ffffff'
+          data: [{% for d in dept_data %}{{ d.count }},{% endfor %}],
+          backgroundColor: ['#4f46e5','#0ea5e9','#10b981','#f59e0b','#8b5cf6'],
+          borderWidth: isDark() ? 3 : 2,
+          borderColor: isDark() ? '#0d0d1a' : '#ffffff',
+          hoverOffset: 10
         }]
       },
       options: {
@@ -206,72 +266,58 @@
         plugins: {
           legend: {
             position: 'bottom',
-            labels: {
-              color: getTextColor(),
-              padding: 15,
-              font: { family: 'Plus Jakarta Sans', size: 11, weight: '500' }
-            }
+            labels: { color: getTextColor(), padding: 18, font: { family: 'Outfit', size: 12, weight: '600' } }
           }
-        }
+        },
+        animation: { animateScale: true, animateRotate: true, duration: 1200 }
       }
     });
 
-    // ─── COURSE ENROLLMENTS CHART ───
+    // Course Bar Chart
     const courseCtx = document.getElementById('courseChart').getContext('2d');
-    const courseLabels = [{% for c in course_data %}"{{ c.code }}",{% endfor %}];
-    const courseCounts = [{% for c in course_data %}{{ c.count }},{% endfor %}];
+    const gradient = courseCtx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(79,70,229,0.9)');
+    gradient.addColorStop(1, 'rgba(14,165,233,0.6)');
 
     const courseChart = new Chart(courseCtx, {
       type: 'bar',
       data: {
-        labels: courseLabels,
+        labels: [{% for c in course_data %}"{{ c.code }}",{% endfor %}],
         datasets: [{
           label: 'Enrolled Students',
-          data: courseCounts,
-          backgroundColor: 'rgba(99, 102, 241, 0.85)',
-          borderRadius: 8,
-          hoverBackgroundColor: '#6366f1'
+          data: [{% for c in course_data %}{{ c.count }},{% endfor %}],
+          backgroundColor: gradient,
+          borderRadius: 10,
+          hoverBackgroundColor: '#0ea5e9'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
+        plugins: { legend: { display: false } },
         scales: {
-          y: {
-            grid: { color: getGridColor() },
-            ticks: { color: getTextColor(), stepSize: 1 }
-          },
-          x: {
-            grid: { display: false },
-            ticks: { color: getTextColor() }
-          }
-        }
+          y: { grid: { color: getGridColor() }, ticks: { color: getTextColor(), stepSize: 1 } },
+          x: { grid: { display: false }, ticks: { color: getTextColor() } }
+        },
+        animation: { duration: 1200, easing: 'easeOutBounce' }
       }
     });
 
-    // Handle theme toggle chart update
+    // Update charts on theme toggle
     const themeBtn = document.getElementById('themeToggle');
     if (themeBtn) {
       themeBtn.addEventListener('click', () => {
         setTimeout(() => {
-          const textColor = getTextColor();
-          const gridColor = getGridColor();
-
-          // Update Dept Chart Borders
-          deptChart.data.datasets[0].borderColor = isDark() ? '#151d30' : '#ffffff';
-          deptChart.data.datasets[0].borderWidth = isDark() ? 2 : 1;
-          deptChart.options.plugins.legend.labels.color = textColor;
+          const tc = getTextColor(), gc = getGridColor();
+          deptChart.data.datasets[0].borderColor = isDark() ? '#0d0d1a' : '#ffffff';
+          deptChart.data.datasets[0].borderWidth = isDark() ? 3 : 2;
+          deptChart.options.plugins.legend.labels.color = tc;
           deptChart.update();
-
-          // Update Course Chart Axes
-          courseChart.options.scales.y.grid.color = gridColor;
-          courseChart.options.scales.y.ticks.color = textColor;
-          courseChart.options.scales.x.ticks.color = textColor;
+          courseChart.options.scales.y.grid.color = gc;
+          courseChart.options.scales.y.ticks.color = tc;
+          courseChart.options.scales.x.ticks.color = tc;
           courseChart.update();
-        }, 100); // Wait for DOM attributes to cycle
+        }, 120);
       });
     }
   });
