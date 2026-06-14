@@ -87,10 +87,14 @@ class Command(BaseCommand):
         student_last_names = ['Reddy', 'Naidu', 'Chowdary', 'Rao', 'Varma', 'Goud', 'Shetty', 'Kumar', 'Raju']
 
         students = []
+        # Create 140 unique name combinations
+        import itertools
+        all_name_combinations = list(itertools.product(student_first_names, student_last_names))
+        random.shuffle(all_name_combinations)
+        
         # Create 140 students
         for i in range(140):
-            fname = random.choice(student_first_names)
-            lname = random.choice(student_last_names)
+            fname, lname = all_name_combinations[i]
             username = f"{fname.lower()}{i}"
             
             u = User.objects.create_user(username=username, first_name=fname, last_name=lname)
