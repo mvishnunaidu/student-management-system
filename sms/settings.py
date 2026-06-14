@@ -18,6 +18,11 @@ if not SECRET_KEY:
 
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', '*').split(',') if host.strip()]
 
+# Automatically trust Railway's generated domain
+RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+if RAILWAY_PUBLIC_DOMAIN and RAILWAY_PUBLIC_DOMAIN not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RAILWAY_PUBLIC_DOMAIN)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -95,6 +100,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -110,6 +116,13 @@ CSRF_TRUSTED_ORIGINS = [
 ] + [
     f'https://{host}' for host in ALLOWED_HOSTS if host not in ('*',)
 ]
+
+# Also trust Railway's public domain if set
+if RAILWAY_PUBLIC_DOMAIN:
+    CSRF_TRUSTED_ORIGINS += [
+        f'http://{RAILWAY_PUBLIC_DOMAIN}',
+        f'https://{RAILWAY_PUBLIC_DOMAIN}',
+    ]
 
 # Messages tag mapping
 from django.contrib.messages import constants as msg_constants
