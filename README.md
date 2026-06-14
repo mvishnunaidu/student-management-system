@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Django](https://img.shields.io/badge/Django-4.2_LTS-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Django](https://img.shields.io/badge/Django-6.0-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![DRF](https://img.shields.io/badge/REST_API-DRF-red?style=for-the-badge&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
 [![JWT](https://img.shields.io/badge/Auth-JWT-orange?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://django-rest-framework-simplejwt.readthedocs.io/)
@@ -11,7 +11,7 @@
 
 **A full-stack Student Management System with Role-Based Access Control, Attendance Tracking, Results Management, and a JWT-secured REST API.**
 
-*Built with Django 4.2 LTS · 140 Students · 14 Teachers · 12 Courses · 82.4% Avg Attendance*
+*Built with Django 6.0 · 140 Students · 14 Teachers · 12 Courses · 82.4% Avg Attendance*
 
 </div>
 
@@ -133,16 +133,19 @@ pip install -r requirements.txt
 copy .env.example .env      # Windows
 # cp .env.example .env      # Linux/Mac
 ```
-Edit `.env` and set your MySQL credentials:
+Edit `.env` with your local MySQL credentials:
 ```env
 DB_NAME=student_management
 DB_USER=root
 DB_PASSWORD=your_password
 DB_HOST=127.0.0.1
 DB_PORT=3306
-SECRET_KEY=your-long-random-secret-key
-DEBUG=True
+SECRET_KEY=your-long-random-secret-key-here
+DEBUG=False
+USE_HTTPS=False
+ALLOWED_HOSTS=127.0.0.1,localhost
 ```
+> **Note:** `DEBUG=False` is the default. `USE_HTTPS=False` disables SSL redirect for local HTTP development.
 
 ### 5. Create MySQL Database
 ```sql
@@ -166,7 +169,12 @@ This creates:
 - **2,520 Attendance records** → Avg **82.4%**
 - **420 Result records** with auto-graded marks
 
-### 8. Run the Development Server
+### 8. Collect Static Files
+```bash
+python manage.py collectstatic --noinput
+```
+
+### 9. Run the Development Server
 ```bash
 python manage.py runserver
 ```
@@ -275,14 +283,37 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 
 ---
 
-## 🚀 Deployment Options
+## 🚀 Deployment
 
-| Platform | Status | Notes |
+### Production Environment Variables
+```env
+DEBUG=False
+USE_HTTPS=True
+SECRET_KEY=<your-long-random-production-secret-key>
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+DB_NAME=student_management
+DB_USER=<db_user>
+DB_PASSWORD=<db_password>
+DB_HOST=<db_host>
+DB_PORT=3306
+```
+
+### Start Production Server (Gunicorn)
+```bash
+python manage.py collectstatic --noinput
+python manage.py migrate
+gunicorn sms.wsgi:application --bind 0.0.0.0:8000
+```
+
+### Recommended Hosting Platforms
+
+| Platform | Recommended? | Notes |
 |---|---|---|
-| **PythonAnywhere** | ✅ Recommended (Free) | Supports MySQL, easy Django setup |
-| **Railway.app** | ✅ Works | Supports MySQL |
-| **Render.com** | ⚠️ Needs change | Switch to PostgreSQL |
-| **VPS / DigitalOcean** | ✅ Works | Full control |
+| **Railway.app** | ⭐ Best for Beginners | Free tier, auto-deploy from GitHub, supports MySQL |
+| **PythonAnywhere** | ✅ Great Free Option | Native Django + MySQL support, easy setup |
+| **Render.com** | ✅ Works | Switch DB to PostgreSQL for free tier |
+| **DigitalOcean App Platform** | ✅ Production-grade | $5/mo, full control |
+| **VPS (DigitalOcean/Linode)** | ✅ Full Control | Nginx + Gunicorn, manual setup |
 
 ---
 

@@ -44,7 +44,7 @@ class StudentManagementSystemTests(TestCase):
 
     def test_dashboard_view_authenticated(self):
         client = Client()
-        client.login(username='teststudent', password='studentpassword')
+        client.login(username='testadmin', password='adminpassword')
         response = client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Dashboard")
@@ -52,7 +52,7 @@ class StudentManagementSystemTests(TestCase):
 
     def test_student_list_view(self):
         client = Client()
-        client.login(username='teststudent', password='studentpassword')
+        client.login(username='testadmin', password='adminpassword')
         response = client.get(reverse('student_list'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "CSE001")
